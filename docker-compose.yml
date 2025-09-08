@@ -1,0 +1,37 @@
+services:
+ # PHP 
+  php:
+    build: './php/'
+    volumes:
+      - ./html/:/var/www/html/
+  # Apache Server
+  apache:
+    image: php:8.2-apache    #check the php version you need for your project
+    build: './apache/'
+    ports:
+      - "80:80"
+    depends_on:
+      - php    
+      - db    #this line links this container to the db container
+    volumes:
+      - ./html:/var/www/html/
+  # MySQL Server
+  db:
+    image: mysql:8.0.43    #check the mysql version you need for your project
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password    #you can change the mysql root password here
+      MYSQL_DATABASE: lamp_db    #you can change the database name here
+    volumes:
+      - mysqldata:/var/lib/mysql    #this line maps the content of ./mysql_data in your pc to the /var/lib/mysql of the container
+  # PhpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"    #this line maps your pc port to the container port
+    depends_on:
+      - db    #this line links this container to the db container
+    environment:
+      PMA_HOST: db
+# Volumes
+volumes:
+  mysqldata:
